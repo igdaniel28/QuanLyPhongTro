@@ -35,24 +35,15 @@ public class RoomController {
 
     @PostMapping("/save")
     public String saveRoom(@ModelAttribute("room") Room room, RedirectAttributes redirectAttributes) {
-        try {
-            roomService.saveRoom(room);
-            redirectAttributes.addFlashAttribute("successMessage", "Lưu thông tin phòng thành công!");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/admin/rooms/add";
-        }
+        roomService.saveRoom(room);
+        redirectAttributes.addFlashAttribute("successMessage", "Lưu thông tin phòng thành công!");
         return "redirect:/admin/rooms";
     }
 
     @GetMapping("/delete/{id}")
     public String deleteRoom(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        try {
-            roomService.deleteRoom(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Đã xóa phòng thành công!");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-        }
+        roomService.deleteRoom(id);
+        redirectAttributes.addFlashAttribute("successMessage", "Đã xóa phòng thành công!");
         return "redirect:/admin/rooms";
     }
 }
