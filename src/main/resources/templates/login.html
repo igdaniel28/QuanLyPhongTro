@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - Quản lý phòng trọ</title>
+    <!-- Kế thừa chung css từ style.css -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .login-page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: var(--bg-body);
+        }
+        .login-box {
+            width: 400px;
+            padding: 40px;
+            text-align: left;
+        }
+        .login-box h2 {
+            margin-bottom: 8px;
+            text-align: center;
+            font-size: 24px;
+        }
+        .login-box p {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+            background: #FAFAFB;
+        }
+        .form-control:focus {
+            border-color: var(--primary);
+            background: #FFFFFF;
+        }
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            margin-top: 16px;
+            justify-content: center;
+        }
+        .btn-login:hover {
+            background-color: #0070df; /* darker primary */
+        }
+        .alert {
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 16px;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: center;
+        }
+        .alert-error {
+            background: var(--danger-light);
+            color: var(--danger);
+            border: 1px solid #ffd6d4;
+        }
+        .alert-success {
+            background: var(--success-light);
+            color: var(--success);
+            border: 1px solid #b7f0c6;
+        }
+    </style>
+</head>
+<body class="login-page">
+
+    <div class="card login-box">
+        <h2>Trọ Xinh</h2>
+        <p>Hệ thống quản lý phòng trọ</p>
+        
+        <!-- Bắt lỗi từ Spring Security (?error=true) -->
+        <div th:if="${param.error}" class="alert alert-error">
+            Sai tên đăng nhập hoặc mật khẩu!
+        </div>
+        
+        <!-- Báo đăng xuất thành công (?logout=true) -->
+        <div th:if="${param.logout}" class="alert alert-success">
+            Bạn đã đăng xuất thành công.
+        </div>
+        
+        <!-- Action phải trỏ tới quá trình security process-login -->
+        <form th:action="@{/process-login}" method="post">
+            <div class="form-group">
+                <label for="username">Tên đăng nhập</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Nhập tên tài khoản..." required autofocus>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Mật khẩu</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Nhập mật khẩu..." required>
+            </div>
+            
+            <button type="submit" class="btn btn-login">Đăng nhập</button>
+        </form>
+    </div>
+
+</body>
+</html>

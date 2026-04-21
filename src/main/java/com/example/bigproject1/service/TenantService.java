@@ -1,5 +1,6 @@
 package com.example.bigproject1.service;
 
+import com.example.bigproject1.exception.DuplicateUserException;
 import com.example.bigproject1.model.Tenant;
 import com.example.bigproject1.model.User;
 import com.example.bigproject1.repository.TenantRepository;
@@ -23,20 +24,18 @@ public class TenantService {
         return tenantRepository.findAll();
     }
 
-    @Transactional // Đảm bảo nếu lỗi thì rollback cả User và Tenant
+    @Transactional
     public void createTenantWithAccount(Tenant tenant, String username, String rawPassword) {
-        // 1. Kiểm tra xem username đã tồn tại chưa
+        // THAY ĐỔI: Sử dụng DuplicateUserException với thông báo chi tiết
         if (userRepository.findByUsername(username).isPresent()) {
-            throw new RuntimeException("Tên đăng nhập đã tồn tại! Vui lòng chọn tên khác.");
+            throw new DuplicateUserException("Tên đăng nhập '" + username + "' đã có người sử dụng! Vui lòng chọn một tên khác.");
         }
 
-        // 2. Tạo tài khoản User cho người thuê
         User user = new User();
         user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(rawPassword)); // Mã hóa mật khẩu
+        user.setPassword(passwordEncoder.encode(rawPassword));
         user.setRole(User.Role.ROLE_TENANT);
 
-        // 3. Liên kết User vào Tenant và lưu vào DB
         tenant.setUser(user);
         tenantRepository.save(tenant);
     }

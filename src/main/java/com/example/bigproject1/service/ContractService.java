@@ -1,5 +1,7 @@
 package com.example.bigproject1.service;
 
+import com.example.bigproject1.exception.InvalidContractException;
+import com.example.bigproject1.exception.ResourceNotFoundException;
 import com.example.bigproject1.model.Contract;
 import com.example.bigproject1.model.Room;
 import com.example.bigproject1.model.Tenant;
@@ -20,28 +22,25 @@ public class ContractService {
 
     @Transactional
     public void createContract(Contract contract, Long roomId, Long tenantId) {
-        // 1. Lấy thông tin phòng và người thuê
+        // THAY ĐỔI: Sử dụng ResourceNotFoundException
         Room room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy phòng!"));
-        Tenant tenant = tenantRepository.findById(tenantId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy người thuê!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Hệ thống không tìm thấy dữ liệu phòng với ID: " + roomId));
 
-        // 2. Kiểm tra logic: Phòng đã có người ở chưa?
+        Tenant tenant = tenantRepository.findById(tenantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Hệ thống không tìm thấy dữ liệu khách thuê với ID: " + tenantId));
+
+        // THAY ĐỔI: Sử dụng InvalidContractException với thông báo chi tiết
         if (room.getStatus() == Room.RoomStatus.OCCUPIED ||
                 contractRepository.existsByRoomIdAndStatus(roomId, Contract.ContractStatus.ACTIVE)) {
-            throw new RuntimeException("Phòng này đã có người thuê, không thể tạo hợp đồng mới!");
+            throw new InvalidContractException("Phòng [" + room.getRoomCode() + "] hiện đã có người thuê, không thể tạo hợp đồng mới!");
         }
 
-        // 3. Gán dữ liệu vào hợp đồng
         contract.setRoom(room);
         contract.setTenant(tenant);
         contract.setStatus(Contract.ContractStatus.ACTIVE);
 
-        // 4. Cập nhật trạng thái phòng thành "Đã có khách"
         room.setStatus(Room.RoomStatus.OCCUPIED);
         roomRepository.save(room);
-
-        // 5. Lưu hợp đồng
         contractRepository.save(contract);
     }
 }

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="vi" th:replace="~{fragments/layout :: layout(~{::title}, ~{::section})}">
+<head>
+    <title>Bảng điều khiển - Quản lý phòng trọ</title>
+</head>
+<body>
+    <section>
+        
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Bảng điều khiển</h1>
+                <p class="page-date">Thứ Tư, 25 Tháng 10, 2023</p>
+            </div>
+            
+            <button class="dropdown-btn">
+                <i class="ph ph-calendar-blank"></i> Trống thuê <i class="ph ph-caret-down"></i>
+            </button>
+        </div>
+        
+        <!-- STAT CARDS -->
+        <div class="stats-grid">
+            <div class="card stat-card">
+                <span class="stat-label">1. Tổng số phòng</span>
+                <span class="stat-value">48</span>
+                <div style="height: 22px;"></div> <!-- Spacer to align with bars -->
+            </div>
+            
+            <div class="card stat-card" style="background-color: #F8FAF9;">
+                <span class="stat-label">2. Phòng trống</span>
+                <span class="stat-value" style="color: #34C759;">10</span>
+                <div class="progress-bar-container" style="background: rgba(52, 199, 89, 0.2);">
+                    <div class="progress-bar" style="width: 25%; background: var(--success);"></div>
+                </div>
+            </div>
+            
+            <div class="card stat-card" style="background-color: #FFF9F2;">
+                <span class="stat-label">3. Phòng đang thuê</span>
+                <span class="stat-value" style="color: #FF9500;">38</span>
+                <div class="progress-bar-container" style="background: rgba(255, 149, 0, 0.2);">
+                    <div class="progress-bar" style="width: 75%; background: var(--warning);"></div>
+                </div>
+            </div>
+            
+            <div class="card stat-card">
+                <span class="stat-label">4. Doanh thu tháng</span>
+                <span class="stat-value">95.000.000 đ</span>
+                <div style="height: 22px;"></div>
+            </div>
+        </div>
+        
+        <!-- CHARTS -->
+        <div class="charts-grid">
+            <div class="card chart-card">
+                <div class="chart-header">
+                    <span class="title-md">Doanh thu tháng 1-10/2023</span>
+                    <button class="dropdown-btn" style="border: none; background: #F2F2F7;">
+                        Điện nước <i class="ph ph-caret-down"></i>
+                    </button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card chart-card">
+                <div class="chart-header">
+                    <span class="title-md">Utility Usage</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="utilityChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TABLES -->
+        <div class="tables-grid">
+            
+            <!-- New Tenants Table -->
+            <div class="card" style="padding: 24px 0;">
+                <div class="table-header" style="padding: 0 24px;">
+                    <span class="title-md">Khách thuê mới</span>
+                    <button class="btn btn-primary-outline" style="border-radius: 20px; font-size: 13px;">Mạnh mới</button>
+                </div>
+                
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>Từ trọ</th>
+                            <th>Chân thuê</th>
+                            <th>Tiền tháng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="person-cell">
+                                    <img src="https://i.pravatar.cc/150?img=11" alt="Avatar" class="person-avatar">
+                                    <div class="person-info">
+                                        <span class="person-name">Nguyễn Văn An</span>
+                                        <span class="person-room">Phòng 101</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>25/10/2023</td>
+                            <td style="font-weight: 600;">95.000.000 đ</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="person-cell">
+                                    <img src="https://i.pravatar.cc/150?img=12" alt="Avatar" class="person-avatar">
+                                    <div class="person-info">
+                                        <span class="person-name">Trần Thị Bích</span>
+                                        <span class="person-room">Phòng 202</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>28/10/2023</td>
+                            <td style="font-weight: 600;">4.500.000 đ</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Due Invoices Table -->
+            <div class="card" style="padding: 24px 0;">
+                <div class="table-header" style="padding: 0 24px;">
+                    <span class="title-md">Hóa đơn đến hạn</span>
+                    <button class="btn btn-secondary" style="border-radius: 20px; font-size: 13px; background: transparent; border: 1px solid #E5E5EA;">
+                        <i class="ph ph-receipt"></i> Tất hóa đơn
+                    </button>
+                </div>
+                
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>Hóa đơn</th>
+                            <th>Thăm date</th>
+                            <th>Đến hạn</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="person-cell">
+                                    <i class="ph-fill ph-file-pdf" style="font-size: 24px; color: var(--danger);"></i>
+                                    <div class="person-info">
+                                        <span class="person-name">Nguyễn Văn An</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>25/10/2023</td>
+                            <td style="font-weight: 600;">95.000.000 đ</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="person-cell">
+                                    <i class="ph-fill ph-file-pdf" style="font-size: 24px; color: var(--success);"></i>
+                                    <div class="person-info">
+                                        <span class="person-name">Nguyễn Thị Cẩm</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>26/10/2023</td>
+                            <td style="font-weight: 600;">95.000.000 đ</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+        
+    </section>
+</body>
+</html>
