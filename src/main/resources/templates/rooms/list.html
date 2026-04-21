@@ -1,10 +1,390 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Quản lý phòng - HotelAdmin</title>
+    <!-- Inject CDNs directly since local layout assets are missing -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/typicons/2.1.2/typicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; background-color: #f4f6f9; margin: 0; padding: 0; overflow-x: hidden; }
+        
+        /* Layout Structure Fixes (Missing Asset Fallback) */
+        .container-scroller { display: flex; flex-direction: column; min-height: 100vh; }
+        .page-body-wrapper { display: flex; flex-direction: row; margin-top: 70px; min-height: calc(100vh - 70px); }
+        .main-panel { margin-left: 250px; flex-grow: 1; display: flex; flex-direction: column; width: calc(100% - 250px); background: #f4f6f9; }
+        .content-wrapper { padding: 30px; flex-grow: 1; }
+        
+        /* Navbar Alignments */
+        .navbar.fixed-top { position: fixed; top: 0; left: 0; right: 0; height: 70px; background: #fff; z-index: 1030; box-shadow: 0 1px 15px rgba(0,0,0,.04); border-bottom: 1px solid #eef2f7; display: flex; padding: 0 20px; align-items: center; justify-content: space-between; }
+        .navbar-brand-wrapper { width: 250px; display: flex; align-items: center; }
+        .navbar-brand { font-size: 1.5rem; font-weight: 800; color: #111c43 !important; text-decoration: none; }
+        .navbar-brand span { color: #111c43 !important; }
+        .navbar-menu-wrapper { display: flex; align-items: center; flex-grow: 1; justify-content: flex-end; }
+        .navbar-nav { display: flex; flex-direction: row; list-style: none; padding: 0; margin: 0; align-items: center; gap: 20px; }
+        .nav-link { color: #5a6a85; text-decoration: none; font-weight: 500; display:flex; align-items:center; }
+        .nav-link h6 { margin: 0; }
+        .navbar-brand-mini { display: none; }
+        
+        /* Sidebar layout styling over Bootstrap */
+        .sidebar { background: #111c43; width: 250px; position: fixed; top: 70px; bottom: 0; left: 0; z-index: 1000; padding: 20px 0; overflow-y: auto; box-shadow: 2px 0 15px rgba(0,0,0,0.05); }
+        .sidebar .nav { display: flex; flex-direction: column; padding: 0; margin: 0; list-style: none; }
+        .sidebar .nav-item { margin: 4px 15px; border-radius: 8px; }
+        .sidebar .nav-link { display: flex; align-items: center; padding: 12px 20px; color: #a3aed1; font-size: 0.95rem; font-weight: 500; transition: all 0.3s; text-decoration: none; border-radius: 12px; }
+        .sidebar .nav-link:hover { color: #fff; background: rgba(255,255,255,0.05); transform: translateX(5px); }
+        .sidebar .nav-item.active .nav-link { background: linear-gradient(135deg, #4318ff, #868cff); color: #fff; box-shadow: 0 4px 15px rgba(67, 24, 255, 0.25); }
+        .sidebar .menu-icon { font-size: 1.4rem; margin-right: 15px; }
+        .menu-title { display: inline-block; }
+        
+        /* Breadcrumb (from layout) */
+        .navbar-breadcrumb { margin: -30px -30px 30px -30px; padding: 20px 30px; background: #fff; border-bottom: 1px solid #eef2f7; display: flex; justify-content: space-between; align-items: center; }
+        .navbar-breadcrumb h4 { font-size: 1.25rem; font-weight: 700; color: #111c43; margin: 0; }
+        .navbar-breadcrumb .d-flex { color: #8a8fa6; font-size: 0.85rem; align-items: center;}
+        .navbar-breadcrumb i { margin: 0 8px; font-size: 1.1rem; }
+        .navbar-links-wrapper { display: none; } /* Hide unnecessary icons in breadcrumb */
+
+        /* Footer */
+        .footer { padding: 20px 0; margin-top: auto; }
+        .footer .card { box-shadow: none; border: none; background: transparent; border-top: 1px dashed #ced4da; border-radius: 0; padding-top: 15px; }
+        
+        /* Dropdown fix */
+        .dropdown-menu-right { right: 0; left: auto; }
+        .dropdown-toggle::after { margin-left: .255em; vertical-align: .255em; content: ""; border-top: .3em solid; border-right: .3em solid transparent; border-bottom: 0; border-left: .3em solid transparent; }
+        .card { 
+            border: none; border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03); 
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            background: #ffffff; overflow: hidden;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.07); }
+        .badge-status-empty {
+            background: linear-gradient(135deg, #00b09b, #96c93d);
+            color: #fff; padding: 6px 16px; border-radius: 30px;
+            font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;
+            box-shadow: 0 4px 10px rgba(0, 176, 155, 0.3);
+            display: inline-flex; align-items: center;
+        }
+        .badge-status-occupied {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            color: #fff; padding: 6px 16px; border-radius: 30px;
+            font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;
+            box-shadow: 0 4px 10px rgba(255, 65, 108, 0.3);
+            display: inline-flex; align-items: center;
+        }
+        .table-rooms { border-collapse: separate; border-spacing: 0 12px; margin-top: -12px; }
+        .table-rooms thead th {
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px; color: #a0aec0; border: none; padding: 16px 20px;
+        }
+        .table-rooms tbody tr { 
+            background-color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            border-radius: 12px; transition: all 0.2s ease;
+        }
+        .table-rooms tbody tr td:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+        .table-rooms tbody tr td:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
+        .table-rooms tbody tr:hover { 
+            transform: scale(1.01); 
+            box-shadow: 0 8px 20px rgba(67, 24, 255, 0.08); 
+            z-index: 10; position: relative;
+        }
+        .table-rooms tbody td { vertical-align: middle; padding: 18px 20px; font-size: 0.95rem; border: none; border-top: 1px solid transparent; border-bottom: 1px solid transparent;}
+        .room-code-chip {
+            background: linear-gradient(135deg, #4318ff, #868cff);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; color: transparent;
+            font-weight: 800; font-size: 1.1rem; font-family: 'Outfit', sans-serif;
+            letter-spacing: 1px;
+        }
+        .btn-action {
+            width: 38px; height: 38px; padding: 0; display: inline-flex;
+            align-items: center; justify-content: center; text-decoration: none;
+            border-radius: 12px; transition: all 0.2s ease; border: none;
+            font-size: 0 !important; color: transparent !important;
+        }
+        .btn-action i { font-size: 1.3rem; margin: 0; padding: 0; line-height: 1; }
+        .btn-action span { display: none; }
+        .btn-action:hover { transform: translateY(-3px); }
+        .btn-edit { background: #f4f7fe; }
+        .btn-edit i { color: #4318ff; }
+        .btn-edit:hover { background: #4318ff; box-shadow: 0 6px 15px rgba(67,24,255,0.3); }
+        .btn-edit:hover i { color: #fff; }
+        .btn-delete { background: #fff0f3; }
+        .btn-delete i { color: #ff416c; }
+        .btn-delete:hover { background: #ff416c; box-shadow: 0 6px 15px rgba(255,65,108,0.3); }
+        .btn-delete:hover i { color: #fff; }
+        .btn-delete:disabled { opacity: 0.5; background: #f0f0f0; transform: none; box-shadow: none; cursor: not-allowed; }
+        .btn-delete:disabled i { color: #a0aec0; }
+        .stat-icon-wrap {
+            width: 56px; height: 56px; border-radius: 16px;
+            display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
+            transition: all 0.3s ease;
+        }
+        .stat-total { background: linear-gradient(135deg, rgba(67, 24, 255, 0.1), rgba(134, 140, 255, 0.1)); }
+        .stat-total i { color: #4318ff; }
+        .stat-empty { background: linear-gradient(135deg, rgba(0, 176, 155, 0.1), rgba(150, 201, 61, 0.1)); }
+        .stat-empty i { color: #00b09b; }
+        .stat-occupied { background: linear-gradient(135deg, rgba(255, 65, 108, 0.1), rgba(255, 75, 43, 0.1)); }
+        .stat-occupied i { color: #ff416c; }
+        .card:hover .stat-icon-wrap { transform: scale(1.1) rotate(8deg); }
+        .search-input {
+            border-radius: 12px; border: 1.5px solid #e2e8f0;
+            padding: 10px 20px; font-size: 0.95rem; transition: all 0.2s;
+            background: #f8f9fa; font-family: 'Outfit', sans-serif;
+        }
+        .search-input:focus {
+            border-color: #4318ff; background: #fff;
+            box-shadow: 0 0 0 4px rgba(67,24,255,0.1); outline: none;
+        }
+        .modal-confirm .modal-header {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            color: #fff; border-radius: 20px 20px 0 0; border: none; padding: 20px;
+        }
+        .modal-confirm .modal-content {
+            border-radius: 20px; border: none; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+        .empty-state { padding: 80px 20px; text-align: center; }
+        .empty-state i { font-size: 5rem; color: #e2e8f0; display: block; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+        .content-wrapper { animation: fadeIn 0.6s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        .btn-primary { 
+            background: linear-gradient(135deg, #4318ff, #868cff); border: none; 
+            box-shadow: 0 4px 15px rgba(67, 24, 255, 0.3); transition: all 0.3s ease;
+            border-radius: 12px; font-weight: 600; padding: 10px 20px;
+            font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(67, 24, 255, 0.4); background: linear-gradient(135deg, #3710da, #6d73f0); }
+        
+        h1, h2, h3, h4, h5, h6 { font-family: 'Outfit', sans-serif; font-weight: 700; }
+        .table-responsive { overflow: visible; }
+    </style>
 </head>
 <body>
+<div class="container-scroller">
 
+    <div th:replace="~{fragments/layout :: navbar}"></div>
+    <div th:replace="~{fragments/layout :: breadcrumb('Quản lý phòng', 'Trang chủ')}"></div>
+
+    <div class="container-fluid page-body-wrapper">
+        <div th:replace="~{fragments/layout :: sidebar}" th:with="activePage='rooms'"></div>
+
+        <div class="main-panel">
+            <div class="content-wrapper">
+
+                <div th:replace="~{fragments/layout :: alerts}"></div>
+
+                <!-- STAT CARDS -->
+                <div class="row mb-4">
+                    <div class="col-md-4 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body d-flex align-items-center justify-content-between">
+                                <div>
+                                    <p class="text-muted mb-1" style="font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;">Tổng số phòng</p>
+                                    <h3 class="mb-0 fw-bold" th:text="${rooms.size()}">0</h3>
+                                </div>
+                                <div class="stat-icon-wrap stat-total">
+                                    <i class="typcn typcn-home-outline"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body d-flex align-items-center justify-content-between">
+                                <div>
+                                    <p class="text-muted mb-1" style="font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;">Phòng trống</p>
+                                    <h3 class="mb-0 fw-bold text-success"
+                                        th:text="${rooms.stream().filter(r -> r.status.name() == 'EMPTY').count()}">0</h3>
+                                </div>
+                                <div class="stat-icon-wrap stat-empty">
+                                    <i class="typcn typcn-tick-outline"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body d-flex align-items-center justify-content-between">
+                                <div>
+                                    <p class="text-muted mb-1" style="font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;">Đang có khách</p>
+                                    <h3 class="mb-0 fw-bold text-danger"
+                                        th:text="${rooms.stream().filter(r -> r.status.name() == 'OCCUPIED').count()}">0</h3>
+                                </div>
+                                <div class="stat-icon-wrap stat-occupied">
+                                    <i class="typcn typcn-user-outline"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TABLE CARD -->
+                <div class="row">
+                    <div class="col-12 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                                    <div>
+                                        <h5 class="mb-1 fw-bold" style="color:#2d3060;">Danh sách phòng</h5>
+                                        <p class="text-muted mb-0" style="font-size:0.85rem;">Quản lý toàn bộ phòng trong hệ thống</p>
+                                    </div>
+                                    <div class="d-flex gap-2 align-items-center flex-wrap">
+                                        <div class="input-group" style="width:220px;">
+                                            <input type="text" id="searchInput" class="form-control search-input"
+                                                   placeholder="Tìm mã phòng..." onkeyup="filterTable()">
+                                            <span class="input-group-text" style="border-radius:0 10px 10px 0;border:1.5px solid #e8e9f0;border-left:none;">
+                        <i class="typcn typcn-zoom"></i>
+                      </span>
+                                        </div>
+                                        <a th:href="@{/admin/rooms/add}" class="btn btn-primary"
+                                           style="border-radius:10px;font-weight:600;padding:8px 18px;">
+                                            <i class="typcn typcn-plus me-1"></i> Thêm phòng
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <table class="table table-rooms" id="roomsTable">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Mã phòng</th>
+                                            <th>Giá / đêm</th>
+                                            <th>Trạng thái</th>
+                                            <th>Ngày tạo</th>
+                                            <th>Cập nhật</th>
+                                            <th class="text-center">Thao tác</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:if="${#lists.isEmpty(rooms)}">
+                                            <td colspan="7">
+                                                <div class="empty-state">
+                                                    <i class="typcn typcn-home-outline"></i>
+                                                    <h6 class="text-muted">Chưa có phòng nào</h6>
+                                                    <p class="text-muted" style="font-size:0.85rem;">Hãy thêm phòng đầu tiên!</p>
+                                                    <a th:href="@{/admin/rooms/add}" class="btn btn-primary btn-sm" style="border-radius:8px;">
+                                                        <i class="typcn typcn-plus me-1"></i> Thêm phòng
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr th:each="room, iter : ${rooms}">
+                                            <td class="text-muted" th:text="${iter.index + 1}">1</td>
+                                            <td>
+                                                <span class="room-code-chip" th:text="${room.roomCode}">P101</span>
+                                            </td>
+                                            <td>
+                                                <strong th:text="${#numbers.formatDecimal(room.price, 0, 'COMMA', 0, 'POINT') + ' ₫'}">500,000 ₫</strong>
+                                            </td>
+                                            <td>
+                          <span th:if="${room.status.name() == 'EMPTY'}" class="badge-status-empty">
+                            <i class="typcn typcn-tick me-1"></i> Trống
+                          </span>
+                                                <span th:if="${room.status.name() == 'OCCUPIED'}" class="badge-status-occupied">
+                            <i class="typcn typcn-user me-1"></i> Có khách
+                          </span>
+                                            </td>
+                                            <td class="text-muted"
+                                                th:text="${room.createdAt != null ? #temporals.format(room.createdAt, 'dd/MM/yyyy HH:mm') : '--'}">
+                                            </td>
+                                            <td class="text-muted"
+                                                th:text="${room.updatedAt != null ? #temporals.format(room.updatedAt, 'dd/MM/yyyy HH:mm') : '--'}">
+                                            </td>
+                                            <td class="text-center">
+                                                <a th:href="@{/admin/rooms/edit/{id}(id=${room.id})}"
+                                                   class="btn btn-action btn-edit me-1">
+                                                    <i class="typcn typcn-edit"></i> Sửa
+                                                </a>
+                                                <button type="button" class="btn btn-action btn-delete"
+                                                        th:disabled="${room.status.name() == 'OCCUPIED'}"
+                                                        th:attr="
+                                    data-room-id=${room.id},
+                                    data-room-code=${room.roomCode},
+                                    data-bs-toggle=${room.status.name() == 'EMPTY' ? 'modal' : ''},
+                                    data-bs-target=${room.status.name() == 'EMPTY' ? '#deleteModal' : ''},
+                                    title=${room.status.name() == 'OCCUPIED' ? 'Không thể xóa phòng đang có khách' : 'Xóa phòng'}"
+                                                        onclick="setDeleteTarget(this)">
+                                                    <i class="typcn typcn-trash"></i>
+                                                    <span th:text="${room.status.name() == 'OCCUPIED' ? 'Đang ở' : 'Xóa'}">Xóa</span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mt-3" th:if="${!#lists.isEmpty(rooms)}">
+                                    <p class="text-muted mb-0" style="font-size:0.83rem;">
+                                        Tổng <strong th:text="${rooms.size()}">0</strong> phòng
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- content-wrapper -->
+
+            <!-- DELETE MODAL -->
+            <div class="modal fade modal-confirm" id="deleteModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" style="max-width:420px;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="typcn typcn-warning me-2"></i> Xác nhận xóa phòng
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body py-4 text-center">
+                            <i class="typcn typcn-trash" style="font-size:3rem;color:#dc3545;display:block;margin-bottom:12px;"></i>
+                            <p class="mb-1" style="font-size:0.95rem;">Bạn có chắc muốn xóa phòng</p>
+                            <h5 class="fw-bold" id="deleteRoomCode" style="color:#dc3545;">P101</h5>
+                            <p class="text-muted" style="font-size:0.83rem;">Hành động này không thể hoàn tác.</p>
+                        </div>
+                        <div class="modal-footer border-0 justify-content-center gap-3">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                    style="border-radius:8px;padding:8px 24px;">Hủy</button>
+                            <a id="deleteConfirmBtn" href="#" class="btn btn-danger"
+                               style="border-radius:8px;padding:8px 24px;font-weight:600;">
+                                <i class="typcn typcn-trash me-1"></i> Xóa
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:replace="~{fragments/layout :: footer}"></div>
+        </div><!-- main-panel -->
+    </div><!-- page-body-wrapper -->
+</div><!-- container-scroller -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<div th:replace="~{fragments/layout :: dateScript}"></div>
+
+<script>
+    function filterTable() {
+        const input = document.getElementById('searchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('#roomsTable tbody tr');
+        rows.forEach(row => {
+            const code = row.querySelector('.room-code-chip');
+            if (code) row.style.display = code.textContent.toLowerCase().includes(input) ? '' : 'none';
+        });
+    }
+
+    function setDeleteTarget(btn) {
+        const roomId   = btn.getAttribute('data-room-id');
+        const roomCode = btn.getAttribute('data-room-code');
+        document.getElementById('deleteRoomCode').textContent = roomCode;
+        document.getElementById('deleteConfirmBtn').href = '/admin/rooms/delete/' + roomId;
+    }
+
+    setTimeout(() => {
+        document.querySelectorAll('.alert').forEach(a => new bootstrap.Alert(a).close());
+    }, 4000);
+</script>
 </body>
 </html>
